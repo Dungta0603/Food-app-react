@@ -1,12 +1,17 @@
 import React from "react";
-import ReactDOM from "react-dom";
-
 import { BrowserRouter as Router } from "react-router-dom";
+import { StateProvider } from "./context/StateProvider";
+import { initialState } from "./context/initalState";
+import reducer from "./context/reducer";
 import App from "./App";
 import "./index.css";
-ReactDOM.render(
+import { createRoot } from "react-dom/client";
+
+const root = createRoot(document.getElementById("root"));
+root.render(
   <Router>
-    <App />
-  </Router>,
-  document.getElementById("root")
+    <StateProvider initialState={initialState} reducer={reducer}>
+      <App />
+    </StateProvider>
+  </Router>
 );
