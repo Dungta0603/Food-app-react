@@ -10,7 +10,6 @@ const firebaseConfig = {
   storageBucket: "food-app-14b52.appspot.com",
   messagingSenderId: "992881043887",
   appId: "1:992881043887:web:4a70b20bdbfba0c729a75a",
-  measurementId: "G-LY3FP7LQ62",
 };
 
 const app = getApps.length > 0 ? getApp() : initializeApp(firebaseConfig);
