@@ -43,7 +43,7 @@ const HomeContainer = () => {
           alt="herobg"
           className="ml-auto h-420 w-full lg:w-auto lg:h-650"
         />
-        <div className=" w-full h-full absolute top-0 left-0 flex items-center justify-center py-4 gap-4 flex-wrap ">
+        <div className=" w-full h-full absolute top-0 left-0 flex items-center justify-center py-4 gap-4 flex-wrap lg:px-32 ">
           {HeroData &&
             HeroData.map(n => (
               <div
