@@ -37,12 +37,12 @@ const Header = () => {
     });
   };
   return (
-    <div className="fixed z-50 w-screen p-3  px-4 md:p-6 md:px-16 bg-primary">
+    <div className="fixed z-50 w-screen span-3  px-4 md:span-6 md:px-16 bg-primary">
       {/**desktop as tablet  */}
       <div className="hidden md:flex w-full h-full items-center justify-between ">
         <Link to={"/"} className=" flex items-centet gap-2 ">
           <img src={Logo} className="w-8 object-cover" alt="Logo" />
-          <p className=" text-headingColor text-xl font-bold">City</p>
+          <span className=" text-headingColor text-xl font-bold">City</span>
         </Link>
         <div className="flex items-center gap-8">
           <motion.ul
@@ -67,7 +67,7 @@ const Header = () => {
           <div className="relative flex items-center justify-center ">
             <MdShoppingBasket className="text-textColor text-2xl" />
             <div className="absolute -top-2 -right-2 w-5 h-5 rounded-full bg-cartNumBg flex items-center justify-center ">
-              <p className="text-xs text-white font-semibold">2</p>
+              <span className="text-xs text-white font-semibold">2</span>
             </div>
           </div>
           <div className="relative">
@@ -87,23 +87,23 @@ const Header = () => {
               >
                 {user && user.email === "taducdung062002@gmail.com" && (
                   <Link to={"/CreateContainer"}>
-                    <p
+                    <div
                       className="px-4 py-2 flex items-center gap-3 cursor-pointer hover:bg-slate-100 transition-all durtion-100 ease-in-out text-textColor text-base  "
                       onClick={() => setIsMenu(false)}
                     >
                       New Item
                       <MdAdd />
-                    </p>
+                    </div>
                   </Link>
                 )}
 
-                <p
+                <span
                   className="px-4 py-2 flex items-center gap-3 cursor-pointer hover:bg-slate-100 transition-all durtion-100 ease-in-out text-textColor text-base"
                   onClick={Logout}
                 >
                   Logout
                   <MdLogout />
-                </p>
+                </span>
               </motion.div>
             )}
           </div>
@@ -115,12 +115,12 @@ const Header = () => {
         <div className="relative flex items-center justify-center ">
           <MdShoppingBasket className="text-textColor text-2xl" />
           <div className="absolute -top-2 -right-2 w-5 h-5 rounded-full bg-cartNumBg flex items-center justify-center ">
-            <p className="text-xs text-white font-semibold">2</p>
+            <span className="text-xs text-white font-semibold">2</span>
           </div>
         </div>
         <Link to={"/"} className=" flex items-centet gap-2 ">
           <img src={Logo} className="w-8 object-cover" alt="Logo" />
-          <p className=" text-headingColor text-xl font-bold">City</p>
+          <span className=" text-headingColor text-xl font-bold">City</span>
         </Link>
         <div className="relative">
           <motion.img
@@ -139,13 +139,13 @@ const Header = () => {
             >
               {user && user.email === "taducdung062002@gmail.com" && (
                 <Link to={"/createItem"}>
-                  <p className="px-4 py-2 flex items-center gap-3 cursor-pointer hover:bg-slate-100 transition-all durtion-100 ease-in-out text-textColor text-base  ">
+                  <span className="px-4 py-2 flex items-center gap-3 cursor-pointer hover:bg-slate-100 transition-all durtion-100 ease-in-out text-textColor text-base  ">
                     New Item
                     <MdAdd />
-                  </p>
+                  </span>
                 </Link>
               )}
-              <p>
+              <span>
                 <ul className="flex flex-col ">
                   <li className=" text-base text-textColor hover:text-headingColor duration-100 transition-all ease-in-out cursor-pointer px-4 py-2">
                     Home
@@ -160,15 +160,15 @@ const Header = () => {
                     Service
                   </li>
                 </ul>
-              </p>
+              </span>
 
-              <p
+              <span
                 className="px-4 py-2 flex items-center justify-center bg-gray-200  gap-3 cursor-pointer hover:bg-slate-300 transition-all duration-100 ease-in-out text-textColor text-base  rounded-xl"
                 onClick={Logout}
               >
                 Logout
                 <MdLogout />
-              </p>
+              </span>
             </motion.div>
           )}
         </div>

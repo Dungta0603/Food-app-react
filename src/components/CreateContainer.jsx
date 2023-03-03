@@ -1,4 +1,3 @@
-import classNames from "classnames";
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import {
@@ -8,29 +7,37 @@ import {
   MdFoodBank,
   MdAttachMoney,
 } from "react-icons/md";
-
-import { storage } from "../firebase.config";
 import { categories } from "../utils/HeroData";
 import Loader from "./Loader";
-import { getDownloadURL, uploadBytesResumable, ref } from "firebase/storage";
+import {
+  deleteObject,
+  getDownloadURL,
+  ref,
+  uploadBytesResumable,
+} from "firebase/storage";
+import { storage } from "../firebase.config";
+import classNames from "classnames";
+import { saveitem } from "../utils/firebaseFunctions";
+
 const CreateContainer = () => {
   const [title, setTitle] = useState("");
   const [calories, setCalories] = useState("");
   const [price, setPrice] = useState("");
-  const [categary, setCategary] = useState(null);
+  const [category, setCategory] = useState(null);
   const [imageAsset, setImageAsset] = useState(null);
   const [fields, setFields] = useState(false);
   const [alertStatus, setAlertStatus] = useState("danger");
   const [msg, setMsg] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-  const upLoadImage = e => {
+
+  const uploadImage = e => {
     setIsLoading(true);
     const imageFile = e.target.files[0];
-    console.log(imageFile);
     const storageRef = ref(storage, `Images/${Date.now()}-${imageFile.name}`);
-    const upLoadTask = uploadBytesResumable(storageRef, imageFile);
-    upLoadTask.on(
-      "shate_changed ",
+    const uploadTask = uploadBytesResumable(storageRef, imageFile);
+
+    uploadTask.on(
+      "state_changed",
       snapshot => {
         const uploadProgress =
           (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
@@ -38,7 +45,7 @@ const CreateContainer = () => {
       error => {
         console.log(error);
         setFields(true);
-        setMsg("Error while uploading : try again ");
+        setMsg("Error while uploading : Try AGain 🙇");
         setAlertStatus("danger");
         setTimeout(() => {
           setFields(false);
@@ -46,24 +53,87 @@ const CreateContainer = () => {
         }, 4000);
       },
       () => {
-        getDownloadURL(upLoadTask.snapshot.ref).then(downloadURL => {
+        getDownloadURL(uploadTask.snapshot.ref).then(downloadURL => {
           setImageAsset(downloadURL);
           setIsLoading(false);
           setFields(true);
-          setMsg("image upload successful");
+          setMsg("Image uploaded successfully 😊");
           setAlertStatus("success");
           setTimeout(() => {
             setFields(false);
-          });
+          }, 4000);
         });
       }
     );
   };
-  const deleteImage = () => {};
-  const saveDetais = () => {};
+  const deleteImage = () => {
+    setIsLoading(true);
+    const deleteRel = ref(storage, imageAsset);
+    deleteObject(deleteRel).then(() => {
+      setImageAsset(null);
+      setIsLoading(false);
+      setFields(true);
+      setMsg("Image uploaded successfully 😊");
+      setAlertStatus("success");
+      setTimeout(() => {
+        setFields(false);
+      }, 4000);
+    });
+  };
+  const saveDetails = () => {
+    setIsLoading(true);
+    try {
+      if (!title || !calories || !imageAsset || !price || !category) {
+        setFields(true);
+        setMsg("Required fields can not be empty");
+        setAlertStatus("danger");
+        setTimeout(() => {
+          setFields(false);
+          setIsLoading(false);
+        }, 4000);
+      } else {
+        const data = {
+          id: `${Date.now()}`,
+          title: title,
+          imageUrl: imageAsset,
+          category: category,
+          calories: calories,
+          qty: 1,
+          price: price,
+        };
+        saveitem(data);
+        setIsLoading(false);
+        setFields(true);
+        setMsg("Data uploaded successfully 😊");
+        setAlertStatus("success");
+        setTimeout(() => {
+          setFields(false);
+          clearDate();
+        }, 4000);
+      }
+    } catch (error) {
+      console.log(error);
+      setFields(true);
+      setMsg("Error while uploading : Try AGain 🙇");
+      setAlertStatus("danger");
+      setTimeout(() => {
+        setFields(false);
+        setIsLoading(false);
+      }, 4000);
+    }
+  };
+
+  const clearDate = () => {
+    setTitle("");
+    setImageAsset(null);
+    setCalories("seclect secalories");
+    setPrice("");
+    setCategory("");
+  };
+
   return (
-    <div className="w-full  min-h-screen flex items-center justify-center ">
-      <div className="w-[90%] md:-[75%] border border-gray-300 rounded-lg p-4 flex flex-col items-center justify-center gap-3  ">
+    <div className="w-full min-h-screen flex items-center justify-center">
+      <div className="w-[90%] md:w-[50%] border border-gray-300 rounded-lg p-4 flex flex-col items-center justify-center gap-4">
         {fields && (
           <motion.p
             initial={{ opacity: 0 }}
@@ -76,34 +146,35 @@ const CreateContainer = () => {
                 : "bg-emerald-400 text-emerald-800"
             )}
           >
-            Something Wrong
             {msg}
           </motion.p>
         )}
-        <div className=" w-full py-2 border-b border-gray flex items-center gap-2 ">
-          <MdFastfood className="text-xl text-gray-700 " />
+
+        <div className="w-full py-2 border-b border-gray-300 flex items-center gap-2">
+          <MdFastfood className="text-xl text-gray-700" />
           <input
-            type="text "
+            type="text"
             required
             value={title}
             onChange={e => setTitle(e.target.value)}
-            placeholder="Give me a title"
-            className=" w-full h-full text-lg bg-transparent font-semibold outline-none border-none placeholder:text-gray-400 text-textColor"
+            placeholder="Give me a title..."
+            className="w-full h-full text-lg bg-transparent outline-none border-none placeholder:text-gray-400 text-textColor"
           />
         </div>
+
         <div className="w-full">
           <select
-            onChange={e => setCategary(e.target.value)}
-            className="outline-none w-full text-base border-b-2 border-gary-200 p-2 rounded-md cursor-pointer"
+            onChange={e => setCategory(e.target.value)}
+            className="outline-none w-full text-base border-b-2 border-gray-200 p-2 rounded-md cursor-pointer"
           >
-            <option className=" bg-white" value="other">
-              select categary
+            <option value="other" className="bg-white">
+              Select Category
             </option>
             {categories &&
               categories.map(item => (
                 <option
                   key={item.id}
-                  className="text-base border-0 outline-none capitalize bg-white text-headingColor "
+                  className="text-base border-0 outline-none capitalize bg-white text-headingColor"
                   value={item.urlParamName}
                 >
                   {item.name}
@@ -111,43 +182,44 @@ const CreateContainer = () => {
               ))}
           </select>
         </div>
-        <div className=" group flex justify-center items-center flex-col border-2 border-dotted border-gray-300 w-full h-255 md:h-420 cursor-pointer rounded-lg">
+
+        <div className="group flex justify-center items-center flex-col border-2 border-dotted border-gray-300 w-full h-225 md:h-340 cursor-pointer rounded-lg">
           {isLoading ? (
             <Loader />
           ) : (
             <>
               {!imageAsset ? (
                 <>
-                  <label className="w-full h-full flex flex-col items-center justify-center cursor-pointer ">
+                  <label className="w-full h-full flex flex-col items-center justify-center cursor-pointer">
                     <div className="w-full h-full flex flex-col items-center justify-center gap-2">
-                      <MdCloudUpload className="text-gray-500 text-2xl" />
-                      <p className="text-gray-500 hover:text-gray-700  ">
+                      <MdCloudUpload className="text-gray-500 text-3xl hover:text-gray-700" />
+                      <p className="text-gray-500 hover:text-gray-700">
                         Click here to upload
                       </p>
                     </div>
                     <input
-                      type="title"
+                      type="file"
                       name="uploadimage"
-                      accept="image/* "
-                      onChange={upLoadImage}
-                      className="h-0 w-0"
-                    ></input>
+                      accept="image/*"
+                      onChange={uploadImage}
+                      className="w-0 h-0"
+                    />
                   </label>
                 </>
               ) : (
                 <>
-                  <div className="relative h-full object-cover ">
+                  <div className="relative h-full">
                     <img
                       src={imageAsset}
                       alt="uploaded image"
                       className="w-full h-full object-cover"
                     />
                     <button
-                      type="button "
-                      className="absolute bottom-3 right-3 p-3 rounded-full bg-red-500 text-xl cursor-pointer outline-none hover:shadow-md duration-500 transition-all ease-in-out "
+                      type="button"
+                      className="absolute bottom-3 right-3 p-3 rounded-full bg-red-500 text-xl cursor-pointer outline-none hover:shadow-md  duration-500 transition-all ease-in-out"
                       onClick={deleteImage}
                     >
-                      <MdDelete className="text-white " />
+                      <MdDelete className="text-white" />
                     </button>
                   </div>
                 </>
@@ -155,37 +227,40 @@ const CreateContainer = () => {
             </>
           )}
         </div>
-        <div className="w-full flex flex-col md:flex-row items-center grap-3 ">
-          <div className="w-full py-2 border-b border-gray-300 flex items-center gap-2 ">
+
+        <div className="w-full flex flex-col md:flex-row items-center gap-3">
+          <div className="w-full py-2 border-b border-gray-300 flex items-center gap-2">
             <MdFoodBank className="text-gray-700 text-2xl" />
             <input
               type="text"
               required
-              placeholder=" Calories"
+              value={calories}
               onChange={e => setCalories(e.target.value)}
+              placeholder="Calories"
               className="w-full h-full text-lg bg-transparent outline-none border-none placeholder:text-gray-400 text-textColor"
             />
           </div>
-          <div className="w-full py-2 border-b border-gray-300 flex items-center gap-2 ">
+
+          <div className="w-full py-2 border-b border-gray-300 flex items-center gap-2">
             <MdAttachMoney className="text-gray-700 text-2xl" />
             <input
               type="text"
               required
-              placeholder=" Price"
-              onChange={e => {
-                setPrice(e.target.value);
-              }}
+              value={price}
+              onChange={e => setPrice(e.target.value)}
+              placeholder="Price"
               className="w-full h-full text-lg bg-transparent outline-none border-none placeholder:text-gray-400 text-textColor"
             />
           </div>
         </div>
-        <div className="flex items-center w-full ">
+
+        <div className="flex items-center w-full">
           <button
-            className="ml-0 md:ml-auto w-full md:w-auto border-none outline-none bg-emerald-500 px-12 py-2 rounded-lg text-lg text-white font-semibold  "
             type="button"
-            onChange={saveDetais}
+            className="ml-0 md:ml-auto w-full md:w-auto border-none outline-none bg-emerald-500 px-12 py-2 rounded-lg text-lg text-white font-semibold"
+            onClick={saveDetails}
           >
-            SAVE
+            Save
           </button>
         </div>
       </div>
