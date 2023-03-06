@@ -17,8 +17,10 @@ import {
 } from "firebase/storage";
 import { storage } from "../firebase.config";
 import classNames from "classnames";
-import { saveitem } from "../utils/firebaseFunctions";
-
+import { saveItem } from "../utils/firebaseFunctions";
+import { actionType } from "../context/reducer";
+import { getAllFoodItems } from "../utils/firebaseFunctions";
+import { useStateValue } from "../context/StateProvider";
 const CreateContainer = () => {
   const [title, setTitle] = useState("");
   const [calories, setCalories] = useState("");
@@ -29,6 +31,7 @@ const CreateContainer = () => {
   const [alertStatus, setAlertStatus] = useState("danger");
   const [msg, setMsg] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [{ foodItems }, dispatch] = useStateValue();
 
   const uploadImage = e => {
     setIsLoading(true);
@@ -101,7 +104,7 @@ const CreateContainer = () => {
           qty: 1,
           price: price,
         };
-        saveitem(data);
+        saveItem(data);
         setIsLoading(false);
         setFields(true);
         setMsg("Data uploaded successfully 😊");
@@ -121,6 +124,7 @@ const CreateContainer = () => {
         setIsLoading(false);
       }, 4000);
     }
+    fetchData();
   };
 
   const clearDate = () => {
@@ -129,6 +133,14 @@ const CreateContainer = () => {
     setCalories("seclect secalories");
     setPrice("");
     setCategory("");
+  };
+  const fetchData = async () => {
+    await getAllFoodItems().then(data => {
+      dispatch({
+        type: actionType.SET_FOOD_ITEMS,
+        foodItems: data,
+      });
+    });
   };
 
   return (
@@ -209,7 +221,7 @@ const CreateContainer = () => {
               ) : (
                 <>
                   <div className="relative h-full">
-                    <img
+                    <image
                       src={imageAsset}
                       alt="uploaded image"
                       className="w-full h-full object-cover"
